@@ -1,3 +1,4 @@
+#include <GL/glut.h>
 class Star{
 public:
 	GLfloat radius,selfSpeed,speed,distance;
@@ -11,7 +12,7 @@ public:
 	virtual	void draw(){
 		drawStar();
 	}
-}
+};
 
 class Planet:public Star{
 public:
@@ -23,16 +24,16 @@ public:
 		drawStar();
 		drawPlanet();
 	}	
-}
+};
 
-class LightPlant:public Planet{
+class LightPlanet:public Planet{
 public:
-	LightPlant(GLfloat radius_,GLfloat selfSpeed_,GLfloat speed_,GLfloat distance_,Star * parentStar_,GLfloat alphaSelf_,GLfloat alpha_,GLfloat color_[4]);
-	void drawLightPlant();
+	LightPlanet(GLfloat radius_,GLfloat selfSpeed_,GLfloat speed_,GLfloat distance_,Star * parentStar_,GLfloat alphaSelf_,GLfloat alpha_,GLfloat color_[4]);
+	void drawLightPlanet();
 	virtual void draw(){
 		drawStar();
 		drawPlanet();
-		drawLightPlant();
+		drawLightPlanet();
 	}
-}
+};
 
