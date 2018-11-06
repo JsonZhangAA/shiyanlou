@@ -1,5 +1,8 @@
 #include <ncurses.h>
 #include <sys/time.h>
+#include <stdlib.h>
+#include <string>
+#include <sstream>
 
 int key;
 WINDOW * game_win;
@@ -31,12 +34,41 @@ public:
 	void nextShape();
 	void changeShape();
 	void clearShape();
+	bool reachBottom();
+	bool isleap(int & temp_x);
 private:
 	int pos_x,pos_y;
 	int shape_x,shape_y,shape_id;
 	int shape[4][4];
 	int map[30][40];
 };
+
+bool Piece::isleap(int & temp_x){
+	int tempV=0;
+	if(shape_x!=4&&shape_x!=3)
+		tempV++;
+	for(int j=0;j<shape_y;j++){
+		if(map[temp_x+shape_x+tempV][pos_y+j+2]==1){
+			return true;
+		}
+	}
+	return false;
+}
+bool Piece::reachBottom(){
+	int temp_x=pos_x+1;
+	/*if(pos_x+4<28)
+		return false;
+	else */
+	if(isleap(temp_x)){
+		return true;
+	}else if(pos_x+4>=28){
+		for(int j=0;j<4;j++){
+			if(shape[3-(pos_x+4-28)][j]==1)
+				return true;
+		}
+	}
+	return false;
+}
 
 void Piece::clearShape(){
 	for(int i=0;i<4;i++){
@@ -68,6 +100,10 @@ void Piece::changeShape(){
 }
 
 void Piece::nextShape(){
+	for(int i=0;i<4;i++){
+		for(int j=0;j<4;j++)
+			shape[i][j]=0;
+	}
 	switch(shape_id){
 		case 0:
 			shape[0][1]=1;
@@ -119,36 +155,64 @@ void Piece::show(){
 	timeout.tv_sec = 0;
 	timeout.tv_usec= 500000;
 	if (select(1, &set, NULL, NULL, &timeout) == 0){
-		clearShape();
-		++pos_x;
-		for(int i=3;i>=0;i--){
-			for(int j=3;j>=0;j--){
-				if(shape[i][j]==1){
-					//列上的移动
-					//mvwaddch(game_win,pos_x+i,pos_y+j,' ');
-					//mvwaddch(game_win,pos_x+i,pos_y+j+1,'#');
+		//clearShape();
+		if(reachBottom()){
+			int x=10;
+			for(int i=3;i>=0;i--){
+				for(int j=3;j>=0;j--){
+					if(shape[i][j]==1){
+						//列上的移动
+						//mvwaddch(game_win,pos_x+i,pos_y+j,' ');
+						//mvwaddch(game_win,pos_x+i,pos_y+j+1,'#');
 
-					//行上的移动
-					//mvwaddch(game_win,pos_x+i,pos_y+1+j,' ');
-					mvwaddch(game_win,pos_x+i+1,pos_y+1+j,'#');
+						//行上的移动
+						//mvwaddch(game_win,pos_x+i,pos_y+1+j,' ');
+						std::string tempS;
+						std::ostringstream ex_msg;
+						ex_msg<<"i: "<<pos_x+i+1<<" j: "<<pos_y+j+1;
+						tempS=ex_msg.str();
+						mvwprintw(game_win,x++,10,tempS.c_str());
+						map[pos_x+i+1][pos_y+j+1]=1;
+						mvwaddch(game_win,pos_x+i+1,pos_y+j+1,'#');
+					}
 				}
 			}
+			pos_x=1;
+			pos_y=5;
+			shape_id=rand()%5;
+			nextShape();
+			wrefresh(game_win);
+		}else{
+			++pos_x;
+			for(int i=3;i>=0;i--){
+				for(int j=3;j>=0;j--){
+					if(shape[i][j]==1){
+						//列上的移动
+						//mvwaddch(game_win,pos_x+i,pos_y+j,' ');
+						//mvwaddch(game_win,pos_x+i,pos_y+j+1,'#');
+
+						//行上的移动
+						mvwaddch(game_win,pos_x+i,pos_y+1+j,' ');
+						mvwaddch(game_win,pos_x+i+1,pos_y+1+j,'#');
+					}
+				}
+			}
+			//pos_x++;
+			//pos_y++;
+			wrefresh(game_win);
 		}
-		//pos_x++;
-		//pos_y++;
-		wrefresh(game_win);
 	}
 	if(FD_ISSET(0,&set)){
 		while((key=getch())==-1);
 
 		if(key==KEY_RIGHT){
-			clearShape();
+			//clearShape();
 			pos_y++;
 			for(int i=0;i<=3;i++){
 				for(int j=3;j>=0;j--){
 					if(shape[i][j]==1){
 						//列上的移动
-						//mvwaddch(game_win,pos_x+i+1,pos_y+j,' ');
+						mvwaddch(game_win,pos_x+i+1,pos_y+j,' ');
 						mvwaddch(game_win,pos_x+i+1,pos_y+j+1,'#');
 					}
 				}
@@ -157,13 +221,13 @@ void Piece::show(){
 		}
 
 		if(key==KEY_LEFT){
-			clearShape();
+			//clearShape();
 			pos_y--;
 			for(int i=0;i<=3;i++){
 				for(int j=0;j<=3;j++){
 					if(shape[i][j]==1){
 						//列上的移动
-						//mvwaddch(game_win,pos_x+i+1,pos_y+j+2,' ');
+						mvwaddch(game_win,pos_x+i+1,pos_y+j+2,' ');
 						mvwaddch(game_win,pos_x+i+1,pos_y+j+1,'#');
 					}
 				}
@@ -205,7 +269,7 @@ int main()
 	refresh();
 	getch();
 	endwin();*/
-	game_win=create_newwin(100,200,0,0);
+	game_win=create_newwin(30,40,0,0);
 	//wprintw(game_win,"Hello World!");
 	wborder(game_win, '*', '*', '*', '*', '*', '*', '*', '*');
 
