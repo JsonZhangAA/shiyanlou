@@ -22,8 +22,10 @@ class Piece{
 public:
 	Piece(){
 		for(int i=0;i<4;i++){
-			for(int j=0;j<4;j++)
+			for(int j=0;j<4;j++){
 				shape[i][j]=0;
+				next_shape[i][j]=0;
+			}
 		}
 		next_shape[0][0]=1;
 		next_shape[1][0]=1;
@@ -36,8 +38,8 @@ public:
 			for(int j=0;j<40;j++)
 				map[i][j]=0;
 		}
-		pos_x=1;
-		pos_y=5;
+		pos_x=0;
+		pos_y=1;
 		gameover=false;
 	}
 	void show();
@@ -144,12 +146,20 @@ void Piece::nextShape(){
 		}
 	}
 	shape[0][3]=0;
-	if(gameover==true){
-		mvwprintw(score_win,5,5,"game over");
-		wrefresh(score_win);
-	}
 	if(reachBottom()){
 		gameover=true;
+		mvwprintw(game_win,15,15,"game over");
+		wrefresh(score_win);
+		for(int i=0;i<=3;i++){
+			for(int j=3;j>=0;j--){
+				if(shape[i][j]==1){
+				//列上的移动
+					//mvwaddch(game_win,pos_x+i+1,pos_y+j,' ');
+					mvwaddch(game_win,pos_x+i+1,pos_y+j+1,'#');
+				}
+			}
+		}
+		wrefresh(game_win);
 	}
 	shape_x=next_shape_x;
 	shape_y=next_shape_y;
@@ -270,8 +280,8 @@ void Piece::show(){
 					}
 				}
 			}
-			pos_x=1;
-			pos_y=5;
+			pos_x=0;
+			pos_y=1;
 			srand((int)time(0));
 			next_shape_id=rand()%7;
 			//shape_id=3;
@@ -416,11 +426,11 @@ int main()
 	//wprintw(game_win,"Hello World!");
 	wborder(game_win, '*', '*', '*', '*', '*', '*', '*', '*');
 	score_win = create_newwin(10,10, 0,50);
-	mvprintw(0,50,"%s","Score");
+	mvwprintw(score_win,0,0,"%s","Score");
 	mvwprintw(score_win,5,5,"0");
 	wrefresh(score_win);
 	next_win=create_newwin(10,10,10,50);
-	mvprintw(10,50,"%s","NextShape");
+	mvwprintw(next_win,0,0,"%s","NextShape");
 	wrefresh(next_win);
 	Piece pce;
 	pce.nextShape();
