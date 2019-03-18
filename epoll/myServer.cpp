@@ -55,13 +55,13 @@ int main(){
 				}
 				//recv(clientfd,buf,BUF_SIZE,0);
 				char Mnums[1];
-				/*ret=recv(clientfd,Mnums,sizeof(Mnums),0);
+				ret=recv(clientfd,Mnums,sizeof(Mnums),0);
 				if(ret<0){
 					perror("choose error");
 					exit(-1);
 				}
-				int MchatId=Mnums[0]-'0';*/
-				int MchatId=0;
+				int MchatId=Mnums[0]-'0';
+				//int MchatId=0;
 				cout<<"MchatId: "<<MchatId<<endl;
 				MUsers * uu=new MUsers(clientfd);
 				uu->chatId=MchatId;

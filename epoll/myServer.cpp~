@@ -61,6 +61,7 @@ int main(){
 					exit(-1);
 				}
 				int MchatId=Mnums[0]-'0';
+				//int MchatId=0;
 				cout<<"MchatId: "<<MchatId<<endl;
 				MUsers * uu=new MUsers(clientfd);
 				uu->chatId=MchatId;
